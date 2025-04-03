@@ -1,103 +1,142 @@
+'use client';
+
+import { useState } from 'react';
 import Image from "next/image";
+import LoginModal from './components/LoginModal';
+import Link from 'next/link';
+
+interface FeatureDetail {
+  title: string;
+  shortDescription: string;
+  fullDescription: string;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const features = [
+    {
+      title: "AI-Powered Matching",
+      shortDescription: "Find the perfect code with our AI matching system.",
+      fullDescription: "It analyzes your needs and connects you to the best solutions, saving time and ensuring quality.",
+      icon: (
+        <Image
+          src="/images/ai-icon.svg"
+          alt="AI Icon"
+          width={80}
+          height={80}
+          className="icon"
+        />
+      )
+    },
+    {
+      title: "Crypto Payments",
+      shortDescription: "Securely process transactions using blockchain technology.",
+      fullDescription: "Enable fast, borderless payments with multiple cryptocurrency options. Implement smart contracts for automated and trustless transactions.",
+      icon: (
+        <Image
+          src="/images/crypto-icon.svg"
+          alt="Crypto Icon"
+          width={80}
+          height={80}
+          className="icon"
+        />
+      )
+    },
+    {
+      title: "Trustless Trading",
+      shortDescription: "Trade with confidence in our secure, decentralized marketplace.",
+      fullDescription: "Smart contracts ensure fair transactions while our escrow system protects both buyers and sellers. Experience truly trustless trading.",
+      icon: (
+        <Image
+          src="/images/trading-icon.svg"
+          alt="Trading Icon"
+          width={80}
+          height={80}
+          className="icon"
+        />
+      )
+    },
+    {
+      title: "Global Marketplace",
+      shortDescription: "Connect with developers worldwide in our thriving marketplace.",
+      fullDescription: "Access a diverse range of code solutions, collaborate on projects, and expand your reach in the global developer community.",
+      icon: (
+        <Image
+          src="/images/globe-icon.svg"
+          alt="Globe Icon"
+          width={80}
+          height={80}
+          className="icon"
+        />
+      )
+    }
+  ];
+
+  return (
+    <main>
+      <section className="hero-section">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Unlock the <span style={{ color: '#2563eb' }}>Future</span> of Code Trading
+          </h1>
+          <h2 className="hero-subtitle">
+            — AI-Powered, Crypto-Secured
+          </h2>
+          <p className="hero-description">
+            Trade Smarter, Build Faster<br />
+            Where Developers Thrive in a<br />
+            Trustless Global Marketplace
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div className="button-group">
+          <button className="button button-primary" onClick={() => setIsLoginModalOpen(true)}>
+            <span>Get Started</span>
+            <svg className="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.75 6.75L19.25 12L13.75 17.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M19 12H4.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <Link href="/market" className="button button-secondary">
+            <span>Explore the Marketplace</span>
+          </Link>
+        </div>
+      </section>
+
+      <div className="features-grid">
+        {features.map((feature, index) => (
+          <div
+            key={index}
+            className={`feature-card ${selectedCardIndex === index ? 'expanded' : ''}`}
+            onClick={() => setSelectedCardIndex(selectedCardIndex === index ? null : index)}
+          >
+            <h3 className="feature-title">{feature.title}</h3>
+            <div className="feature-icon">
+              {feature.icon}
+            </div>
+            <p className="feature-description">
+              {selectedCardIndex === index ? feature.fullDescription : feature.shortDescription}
+            </p>
+            {selectedCardIndex === index && (
+              <button 
+                className="feature-detail-close"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedCardIndex(null);
+                }}
+              >
+                X
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
+    </main>
   );
 }
