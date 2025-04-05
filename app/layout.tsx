@@ -9,6 +9,8 @@ import MyPageIcon from "@/public/images/mypage-icon.svg";
 import AiAuditIcon from "@/public/images/ai-audit-icon.svg";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import './styles/ai-audit.css';
+import './styles/code-nft.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
