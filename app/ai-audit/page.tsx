@@ -1,10 +1,12 @@
 "use client";
 
 import '../styles/ai-audit.css';
+import '../styles/loading-transition.css';
 import React, { useRef, useEffect, useState } from 'react';
 import { analyzeContract, type AnalysisResult, type CheckResult, statusColors } from '../services/ai-audit/ai-auditApi';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import LoadingTransition from '../components/LoadingTransition';
 
 interface Message {
   type: 'user' | 'assistant' | 'system';
@@ -105,6 +107,7 @@ export default function AiAuditPage() {
   const [shouldScroll, setShouldScroll] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -296,8 +299,38 @@ export default function AiAuditPage() {
     }
   };
 
-  const handleExportNFT = (code: string) => {
-    router.push(`/code-nft?code=${encodeURIComponent(code)}`);
+  const handleExportNFT = async () => {
+    setIsExporting(true);
+    
+    try {
+      const response = await fetch('/api/code-nft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: lastAnalyzedCode,
+          auditResult: messages[messages.length - 1].analysisResult,
+        }),
+      });
+
+      const data = await response.json();
+      console.log('API Response:', data);
+
+      if (data.success) {
+        console.log('Navigating to:', `/code-nft?sessionId=${data.sessionId}`);
+        // 로딩 페이지를 유지한 채로 페이지 이동
+        window.location.href = `/code-nft?sessionId=${data.sessionId}`;
+      } else {
+        console.error('API Error:', data.error);
+        alert('NFT 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        setIsExporting(false); // 에러 시에만 로딩 상태 해제
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      alert('서버 통신 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setIsExporting(false); // 에러 시에만 로딩 상태 해제
+    }
   };
 
   const renderMessage = (message: Message, index: number) => {
@@ -336,11 +369,7 @@ export default function AiAuditPage() {
                     <button 
                       className="export-button"
                       disabled={!isExportEnabled}
-                      onClick={() => {
-                        if (isExportEnabled) {
-                          handleExportNFT(lastAnalyzedCode);
-                        }
-                      }}
+                      onClick={handleExportNFT}
                     >
                       Export as NFT
                       <Image src="/images/send-icon.svg" alt="Export" width={16} height={16} />
@@ -357,57 +386,60 @@ export default function AiAuditPage() {
   };
 
   return (
-    <div className="ai-audit-container">
-      <div className="ai-audit-header">
-        <div className="header-logo">
-          <div className="logo-icon">
-            <img src="/images/ai-audit-icon.svg" alt="AI Audit Icon" />
+    <>
+      {isExporting && <LoadingTransition />}
+      <div className="ai-audit-container">
+        <div className="ai-audit-header">
+          <div className="header-logo">
+            <div className="logo-icon">
+              <img src="/images/ai-audit-icon.svg" alt="AI Audit Icon" />
+            </div>
+            <div className="header-text">
+              <h1>AI-Audit</h1>
+              <h2>
+                <span className="title-with-underline">Smart Contract</span>
+                <br />
+                <span className="title-with-underline">Vulnerability Analysis</span>
+              </h2>
+            </div>
           </div>
-          <div className="header-text">
-            <h1>AI-Audit</h1>
-            <h2>
-              <span className="title-with-underline">Smart Contract</span>
+          <div className="header-description">
+            <p>
+              "Enter your smart contract code"{" "}
               <br />
-              <span className="title-with-underline">Vulnerability Analysis</span>
-            </h2>
+              <span className="highlight">click the <span className="button-text">Analyze</span> button to scan for vulnerabilities."</span>
+            </p>
           </div>
         </div>
-        <div className="header-description">
-          <p>
-            "Enter your smart contract code"{" "}
-            <br />
-            <span className="highlight">click the <span className="button-text">Analyze</span> button to scan for vulnerabilities."</span>
-          </p>
-        </div>
-      </div>
 
-      <div className="chat-container">
-        <div className="chat-messages">
-          {messages.map((message, index) => renderMessage(message, index))}
-          <div ref={messagesEndRef} />
-        </div>
+        <div className="chat-container">
+          <div className="chat-messages">
+            {messages.map((message, index) => renderMessage(message, index))}
+            <div ref={messagesEndRef} />
+          </div>
 
-        <div className="chat-input">
-          <div className="input-wrapper">
-            <textarea
-              ref={textareaRef}
-              value={inputValue}
-              onChange={handleTextareaInput}
-              onKeyDown={handleKeyDown}
-              placeholder="Enter your contract codes here..." //Press '/' to start typing... 
-              rows={1}
-            />
-            <button 
-              className="analyze-button" 
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              <span>Analyze</span>
-              <img src="/images/send-icon.svg" alt="Send" />
-            </button>
+          <div className="chat-input">
+            <div className="input-wrapper">
+              <textarea
+                ref={textareaRef}
+                value={inputValue}
+                onChange={handleTextareaInput}
+                onKeyDown={handleKeyDown}
+                placeholder="Enter your contract codes here..." //Press '/' to start typing... 
+                rows={1}
+              />
+              <button 
+                className="analyze-button" 
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                <span>Analyze</span>
+                <img src="/images/send-icon.svg" alt="Send" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 } 

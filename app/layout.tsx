@@ -10,7 +10,8 @@ import AiAuditIcon from "@/public/images/ai-audit-icon.svg";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import './styles/ai-audit.css';
-import './styles/code-nft.css';
+import './styles/code-nft.module.css';
+import './styles/loading-transition.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
