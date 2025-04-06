@@ -185,9 +185,15 @@ export default function CodeNFTPage() {
                 </p>
 
                 <div className={styles.nftInfo}>
-                  <p className={styles.nftCreator}>
-                    {isMinted ? 'Mint Tx Hash' : 'Creator: DEV1'}
-                  </p>
+                  <div className={styles.nftCreator}>
+                    Mint Tx Hash
+                  </div>
+                  <div className={styles.nftUrl}>
+                    kv. http://example.com
+                  </div>
+                  <div className={styles.nftUrl}>
+                    log. http://example.com
+                  </div>
                   <div className={styles.dateBox}>
                     <div className={styles.dateLabel}>Date of Release</div>
                     <div className={styles.dateValue}>{releaseDate}</div>
