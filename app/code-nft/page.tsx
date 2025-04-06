@@ -18,6 +18,10 @@ export default function CodeNFTPage() {
   const [nftName, setNftName] = useState('Eliza Plugin');
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('0xdf23edfef');
+  const [tempAddress, setTempAddress] = useState('');
+  const [releaseDate, setReleaseDate] = useState('');
 
   useEffect(() => {
     const fetchNFTData = async () => {
@@ -41,6 +45,15 @@ export default function CodeNFTPage() {
     fetchNFTData();
   }, [sessionId]);
 
+  useEffect(() => {
+    // 현재 날짜를 YYYY.MM.DD 형식으로 변환
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    setReleaseDate(`${year}.${month}.${day}`);
+  }, []);
+
   const handleConnectWallet = () => {
     setIsWalletConnected(true);
   };
@@ -51,6 +64,24 @@ export default function CodeNFTPage() {
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
+  };
+
+  const handleAddressChange = () => {
+    setIsEditingAddress(true);
+    setTempAddress(walletAddress);
+  };
+
+  const handleAddressSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (tempAddress.trim()) {
+      setWalletAddress(tempAddress.trim());
+      setIsEditingAddress(false);
+    }
+  };
+
+  const handleAddressCancel = () => {
+    setIsEditingAddress(false);
+    setTempAddress('');
   };
 
   if (isLoading) {
@@ -90,8 +121,8 @@ export default function CodeNFTPage() {
                 <div className={styles.nftInfo}>
                   <p className={styles.nftCreator}>Creator: DEV1</p>
                   <div className={styles.dateBox}>
-                    <p className={styles.dateLabel}>Date of Release</p>
-                    <p className={styles.dateValue}>2025.04.12</p>
+                    <div className={styles.dateLabel}>Date of Release</div>
+                    <div className={styles.dateValue}>{releaseDate}</div>
                   </div>
                 </div>
 
@@ -156,8 +187,28 @@ function elizaPlugin() {
                 <div className={styles.walletAddressBox}>
                   <h3>Web3 Wallet Address</h3>
                   <Image src="/images/wallet.svg" alt="Wallet" width={20} height={20} />
-                  <p className={styles.walletAddress}>"0xdf23edfef"</p>
-                  <button className={styles.changeWalletText}>change wallet address</button>
+                  {isEditingAddress ? (
+                    <form onSubmit={handleAddressSubmit} className={styles.addressForm}>
+                      <input
+                        type="text"
+                        value={tempAddress}
+                        onChange={(e) => setTempAddress(e.target.value)}
+                        className={styles.addressInput}
+                        placeholder="Enter wallet address"
+                      />
+                      <div className={styles.addressActions}>
+                        <button type="submit" className={styles.addressSubmit}>Save</button>
+                        <button type="button" onClick={handleAddressCancel} className={styles.addressCancel}>Cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <p className={styles.walletAddress}>{walletAddress}</p>
+                      <div className={styles.changeWalletText} onClick={handleAddressChange}>
+                        Change wallet address
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
