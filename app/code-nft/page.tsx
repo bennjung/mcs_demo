@@ -17,11 +17,15 @@ export default function CodeNFTPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [nftName, setNftName] = useState('Eliza Plugin');
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [walletAddress, setWalletAddress] = useState('0xdf23edfef');
   const [tempAddress, setTempAddress] = useState('');
   const [releaseDate, setReleaseDate] = useState('');
+  const [isMinting, setIsMinting] = useState(false);
+  const [isMinted, setIsMinted] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState('');
 
   useEffect(() => {
     const fetchNFTData = async () => {
@@ -59,11 +63,16 @@ export default function CodeNFTPage() {
   };
 
   const handleMint = () => {
-    console.log('Minting NFT:', nftName);
+    setIsMinting(true);
+    // 민팅 프로세스를 시뮬레이션하기 위한 타임아웃
+    setTimeout(() => {
+      setIsMinted(true);
+      setIsMinting(false);
+    }, 1000);
   };
 
   const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+    setIsCardFlipped(!isCardFlipped);
   };
 
   const handleAddressChange = () => {
@@ -84,6 +93,26 @@ export default function CodeNFTPage() {
     setTempAddress('');
   };
 
+  const handleNameChange = () => {
+    if (!isMinted) {
+      setIsEditingName(true);
+      setTempName(nftName);
+    }
+  };
+
+  const handleNameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (tempName.trim()) {
+      setNftName(tempName.trim());
+      setIsEditingName(false);
+    }
+  };
+
+  const handleNameCancel = () => {
+    setIsEditingName(false);
+    setTempName('');
+  };
+
   if (isLoading) {
     return <div className={styles.loadingState}>Loading NFT data...</div>;
   }
@@ -91,35 +120,74 @@ export default function CodeNFTPage() {
   return (
     <div className={styles.nftPage}>
       <div className={styles.nftContainer}>
-        {/* 헤더 */}
-        <div className={styles.header}>
+        <div className={`${styles.header} ${isMinted ? styles.headerMinted : ''}`}>
           <p className={styles.headerSubtitle}>Modular Code Marketplace</p>
           <h1 className={styles.headerTitle}>
-            <span className={styles.headerLogo}>
-              <Image src="/images/marketplace-icon.svg" alt="Logo" width={32} height={32} />
-            </span>
+            <Image
+              src="/images/marketplace-icon.svg"
+              alt="Logo"
+              width={32}
+              height={32}
+              className={styles.headerLogo}
+            />
             Code NFT Mint
-            <span className={styles.headerUnderline}></span>
+            <div className={styles.headerUnderline} />
           </h1>
-          <p className={styles.headerDescription}>Name your NFT and verify to Mint!</p>
+          {isMinted ? (
+            <p className={styles.headerDescription}>Congratulations! Your NFT Mint is successfully completed!</p>
+          ) : (
+            <p className={styles.headerDescription}>Name your NFT and verify to Mint!</p>
+          )}
         </div>
 
-        {/* 카드 레이아웃 */}
-        <div className={styles.cardsContainer}>
-          {/* NFT 카드 */}
-          <div className={styles.cardWrapper}>
-            <div className={`${styles.nftCard} ${isFlipped ? styles.flipped : ''}`}>
+        <div className={`${styles.cardsContainer} ${isMinted ? styles.cardsMinted : ''}`}>
+          <div className={`${styles.cardWrapper} ${isMinted ? styles.cardMinted : ''}`}>
+            <div className={`${styles.nftCard} ${isCardFlipped ? styles.flipped : ''}`}>
               {/* 카드 앞면 */}
               <div className={styles.cardFront}>
+                <Image
+                  src="/images/star.svg"
+                  alt="Star"
+                  width={24}
+                  height={24}
+                  className={`${styles.starIcon} ${isMinted ? styles.starIconMinted : ''}`}
+                  style={{
+                    filter: isMinted ? 'brightness(0) saturate(100%) invert(43%) sepia(93%) saturate(1752%) hue-rotate(210deg) brightness(101%) contrast(101%)' : 'none'
+                  }}
+                />
                 <div className={styles.nftTag}>NFT</div>
-                <h2 className={styles.nftTitle}>
-                  {nftName}
-                  <span className={styles.nftTitleUnderline}></span>
-                </h2>
-                <p className={styles.nftSubtitle}>give your NFT a name!</p>
+                {isEditingName ? (
+                  <form onSubmit={handleNameSubmit} className={styles.nameForm}>
+                    <input
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      className={styles.nameInput}
+                      placeholder="Enter NFT name"
+                      autoFocus
+                    />
+                    <div className={styles.nameActions}>
+                      <button type="submit" className={styles.nameSubmit}>Save</button>
+                      <button type="button" onClick={handleNameCancel} className={styles.nameCancel}>Cancel</button>
+                    </div>
+                  </form>
+                ) : (
+                  <h2 
+                    className={`${styles.nftTitle} ${!isMinted ? styles.editable : ''}`} 
+                    onClick={handleNameChange}
+                  >
+                    {nftName}
+                    <span className={styles.nftTitleUnderline}></span>
+                  </h2>
+                )}
+                <p className={styles.nftSubtitle}>
+                  {isMinted ? `by "${walletAddress}"` : 'give your NFT a name!'}
+                </p>
 
                 <div className={styles.nftInfo}>
-                  <p className={styles.nftCreator}>Creator: DEV1</p>
+                  <p className={styles.nftCreator}>
+                    {isMinted ? 'Mint Tx Hash' : 'Creator: DEV1'}
+                  </p>
                   <div className={styles.dateBox}>
                     <div className={styles.dateLabel}>Date of Release</div>
                     <div className={styles.dateValue}>{releaseDate}</div>
@@ -173,78 +241,79 @@ function elizaPlugin() {
             </div>
           </div>
 
-          {/* 민팅 섹션 */}
-          <div className={styles.mintingSection}>
-            <div className={`${styles.mintPrompt} ${isWalletConnected ? styles.hidden : ''}`}>
-              <div className={styles.mintArrow}>
-                <Image src="/images/arrow-curve.svg" alt="Arrow" width={48} height={48} />
-              </div>
-              <p className={styles.mintReadyText}>ready to mint?</p>
-            </div>
-
-            <div className={styles.mintBox}>
-              {isWalletConnected && (
-                <div className={styles.walletAddressBox}>
-                  <h3>Web3 Wallet Address</h3>
-                  <Image src="/images/wallet.svg" alt="Wallet" width={20} height={20} />
-                  {isEditingAddress ? (
-                    <form onSubmit={handleAddressSubmit} className={styles.addressForm}>
-                      <input
-                        type="text"
-                        value={tempAddress}
-                        onChange={(e) => setTempAddress(e.target.value)}
-                        className={styles.addressInput}
-                        placeholder="Enter wallet address"
-                      />
-                      <div className={styles.addressActions}>
-                        <button type="submit" className={styles.addressSubmit}>Save</button>
-                        <button type="button" onClick={handleAddressCancel} className={styles.addressCancel}>Cancel</button>
-                      </div>
-                    </form>
-                  ) : (
-                    <>
-                      <p className={styles.walletAddress}>{walletAddress}</p>
-                      <div className={styles.changeWalletText} onClick={handleAddressChange}>
-                        Change wallet address
-                      </div>
-                    </>
-                  )}
+          {!isMinted && (
+            <div className={`${styles.mintingSection} ${isMinting ? styles.minting : ''}`}>
+              <div className={`${styles.mintPrompt} ${isWalletConnected ? styles.hidden : ''}`}>
+                <div className={styles.mintArrow}>
+                  <Image src="/images/arrow-curve.svg" alt="Arrow" width={48} height={48} />
                 </div>
-              )}
+                <p className={styles.mintReadyText}>ready to mint?</p>
+              </div>
 
-              <p className={styles.walletMessage}>
-                "Make sure to connect your<br />
-                <strong>Web3 Wallet</strong> to continue!"
-              </p>
-              
-              {isWalletConnected ? (
-                <button className={`${styles.connectWalletButton} ${styles.connected}`}>
-                  <Image src="/images/checkbox.svg" alt="Connected" width={20} height={20} />
-                  Wallet Connected
-                </button>
-              ) : (
-                <button onClick={handleConnectWallet} className={styles.connectWalletButton}>
-                  CONNECT WALLET
-                  <Image src="/images/wallet.svg" alt="Wallet" width={20} height={20} />
-                </button>
-              )}
+              <div className={styles.mintBox}>
+                {isWalletConnected && (
+                  <div className={styles.walletAddressBox}>
+                    <h3>Web3 Wallet Address</h3>
+                    <Image src="/images/wallet.svg" alt="Wallet" width={20} height={20} />
+                    {isEditingAddress ? (
+                      <form onSubmit={handleAddressSubmit} className={styles.addressForm}>
+                        <input
+                          type="text"
+                          value={tempAddress}
+                          onChange={(e) => setTempAddress(e.target.value)}
+                          className={styles.addressInput}
+                          placeholder="Enter wallet address"
+                        />
+                        <div className={styles.addressActions}>
+                          <button type="submit" className={styles.addressSubmit}>Save</button>
+                          <button type="button" onClick={handleAddressCancel} className={styles.addressCancel}>Cancel</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        <p className={styles.walletAddress}>{walletAddress}</p>
+                        <div className={styles.changeWalletText} onClick={handleAddressChange}>
+                          Change wallet address
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
 
-              <button
-                className={`${styles.mintButton} ${isWalletConnected ? styles.mintButtonEnabled : styles.mintButtonDisabled}`}
-                onClick={handleMint}
-                disabled={!isWalletConnected}
-              >
-                <Image 
-                  src="/images/rocket.svg" 
-                  alt="Rocket" 
-                  width={20} 
-                  height={20} 
-                  className={styles.rocketIcon}
-                />
-                <span>Mint</span>
-              </button>
+                <p className={styles.walletMessage}>
+                  "Make sure to connect your<br />
+                  <strong>Web3 Wallet</strong> to continue!"
+                </p>
+                
+                {isWalletConnected ? (
+                  <button className={`${styles.connectWalletButton} ${styles.connected}`}>
+                    <Image src="/images/checkbox.svg" alt="Connected" width={20} height={20} />
+                    Wallet Connected
+                  </button>
+                ) : (
+                  <button onClick={handleConnectWallet} className={styles.connectWalletButton}>
+                    CONNECT WALLET
+                    <Image src="/images/wallet.svg" alt="Wallet" width={20} height={20} />
+                  </button>
+                )}
+
+                <button
+                  className={`${styles.mintButton} ${isWalletConnected ? styles.mintButtonEnabled : styles.mintButtonDisabled}`}
+                  onClick={handleMint}
+                  disabled={!isWalletConnected}
+                >
+                  <Image 
+                    src="/images/rocket.svg" 
+                    alt="Rocket" 
+                    width={20} 
+                    height={20} 
+                    className={styles.rocketIcon}
+                  />
+                  <span>Mint</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
