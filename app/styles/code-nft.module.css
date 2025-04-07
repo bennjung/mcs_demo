@@ -279,7 +279,7 @@
 .nftSubtitle {
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.1rem;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -300,17 +300,18 @@
 .nftInfo::after {
   content: '';
   position: absolute;
-  bottom: -1rem;
+  bottom: -0.5rem;
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
   height: 1px;
   background-color: rgba(255, 255, 255, 1);
+  display: var(--display-line, block);
 }
 
 .nftCreator {
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.25rem;
+  margin-bottom: 4.25rem;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1.25rem;
 }
@@ -331,12 +332,12 @@
 }
 
 .dateBox {
-  background-color: #81B096;
+  background-color: rgba(129, 176, 150, 0.9);
   color: white;
-  padding: 0.75rem 2.75rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem 3rem;
+  border-radius: 1rem;
   backdrop-filter: blur(4px);
-  margin-top: 2.5rem;
+  margin-top: 1.5rem;
   margin-bottom: 0.5rem;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -345,22 +346,28 @@
   text-align: center;
 }
 
+.cardMinted .dateBox {
+  background-color: rgba(129, 176, 150, 0.9);
+  border-radius: 1rem;
+  width: 80%;
+  max-width: 300px;
+}
+
 .nftCard:hover .dateBox {
   transform: translateY(-4px);
 }
 
 .dateLabel {
-  font-size: 0.875rem;
-  font-weight: 500;
-  opacity: 0.9;
-  margin-bottom: 0.5rem;
-  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.25rem;
 }
 
 .dateValue {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  text-align: center;
+  color: white;
 }
 
 .openCodesButton {
@@ -892,4 +899,54 @@
 .nameCancel:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.4);
+}
+
+.mintedSubtitle {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.75rem;
+}
+
+.mintedCreator {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.resultReport {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 1.5rem;
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  background-color: rgba(129, 176, 150, 0.4);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+}
+
+.resultLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.resultValue {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.cardFadingOut {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mintingFadingOut {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 } 

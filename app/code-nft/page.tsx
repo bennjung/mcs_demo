@@ -21,11 +21,12 @@ export default function CodeNFTPage() {
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [walletAddress, setWalletAddress] = useState('0xdf23edfef');
   const [tempAddress, setTempAddress] = useState('');
-  const [releaseDate, setReleaseDate] = useState('');
+  const [releaseDate, setReleaseDate] = useState('2025.04.07');
   const [isMinting, setIsMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState('');
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
     const fetchNFTData = async () => {
@@ -63,12 +64,19 @@ export default function CodeNFTPage() {
   };
 
   const handleMint = () => {
-    setIsMinting(true);
-    // 민팅 프로세스를 시뮬레이션하기 위한 타임아웃
+    if (!isWalletConnected) return;
+    
+    setIsFadingOut(true);
+    
     setTimeout(() => {
-      setIsMinted(true);
-      setIsMinting(false);
-    }, 1000);
+      setIsMinting(true);
+      
+      setTimeout(() => {
+        setIsMinted(true);
+        setIsMinting(false);
+        setIsFadingOut(false);
+      }, 1200);
+    }, 400);
   };
 
   const handleFlip = () => {
@@ -141,9 +149,8 @@ export default function CodeNFTPage() {
         </div>
 
         <div className={`${styles.cardsContainer} ${isMinted ? styles.cardsMinted : ''}`}>
-          <div className={`${styles.cardWrapper} ${isMinted ? styles.cardMinted : ''}`}>
+          <div className={`${styles.cardWrapper} ${isMinted ? styles.cardMinted : ''} ${isFadingOut ? styles.cardFadingOut : ''}`}>
             <div className={`${styles.nftCard} ${isCardFlipped ? styles.flipped : ''}`}>
-              {/* 카드 앞면 */}
               <div className={styles.cardFront}>
                 <Image
                   src="/images/star.svg"
@@ -156,59 +163,78 @@ export default function CodeNFTPage() {
                   }}
                 />
                 <div className={styles.nftTag}>NFT</div>
-                {isEditingName ? (
-                  <form onSubmit={handleNameSubmit} className={styles.nameForm}>
-                    <input
-                      type="text"
-                      value={tempName}
-                      onChange={(e) => setTempName(e.target.value)}
-                      className={styles.nameInput}
-                      placeholder="Enter NFT name"
-                      autoFocus
-                    />
-                    <div className={styles.nameActions}>
-                      <button type="submit" className={styles.nameSubmit}>Save</button>
-                      <button type="button" onClick={handleNameCancel} className={styles.nameCancel}>Cancel</button>
+                {isMinted ? (
+                  <div className={styles.nftInfo} style={{ '--display-line': 'none' } as React.CSSProperties}>
+                    <div className={styles.nftTitle}>
+                      Eliza Plugin
                     </div>
-                  </form>
+                    <div className={`${styles.nftSubtitle} ${styles.mintedSubtitle}`}>
+                      by "0xdf23edfef"
+                    </div>
+                    <div className={`${styles.nftCreator} ${styles.mintedCreator}`}>
+                      Mint Tx Hash
+                    </div>
+                    <div className={styles.resultReport}>
+                      <div className={styles.resultRow}>
+                        <span className={styles.resultLabel}>Security Status</span>
+                        <a href="https://example.com" className={styles.resultValue}>https:/// example.com</a>
+                      </div>
+                      <div className={styles.resultRow}>
+                        <span className={styles.resultLabel}>Scan Log.</span>
+                        <a href="https://example.com" className={styles.resultValue}>https:/// example.com</a>
+                      </div>
+                    </div>
+                    <div className={styles.dateBox}>
+                      <div className={styles.dateLabel}>Date of Release</div>
+                      <div className={styles.dateValue}>2025.04.12</div>
+                    </div>
+                  </div>
                 ) : (
-                  <h2 
-                    className={`${styles.nftTitle} ${!isMinted ? styles.editable : ''}`} 
-                    onClick={handleNameChange}
-                  >
-                    {nftName}
-                    <span className={styles.nftTitleUnderline}></span>
-                  </h2>
+                  <>
+                    {isEditingName ? (
+                      <form onSubmit={handleNameSubmit} className={styles.nameForm}>
+                        <input
+                          type="text"
+                          value={tempName}
+                          onChange={(e) => setTempName(e.target.value)}
+                          className={styles.nameInput}
+                          placeholder="Enter NFT name"
+                          autoFocus
+                        />
+                        <div className={styles.nameActions}>
+                          <button type="submit" className={styles.nameSubmit}>Save</button>
+                          <button type="button" onClick={handleNameCancel} className={styles.nameCancel}>Cancel</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <h2 
+                        className={`${styles.nftTitle} ${!isMinted ? styles.editable : ''}`} 
+                        onClick={handleNameChange}
+                      >
+                        {nftName}
+                        <span className={styles.nftTitleUnderline}></span>
+                      </h2>
+                    )}
+                    <p className={styles.nftSubtitle}>
+                      give your NFT a name!
+                    </p>
+                    <div className={styles.nftInfo}>
+                      <div className={styles.nftCreator}>Creator: DEV1</div>
+                      <div className={styles.dateBox}>
+                        <div className={styles.dateLabel}>Date of Release</div>
+                        <div className={styles.dateValue}>{releaseDate}</div>
+                      </div>
+                    </div>
+                    <button className={styles.openCodesButton} onClick={handleFlip}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 19L8 12L15 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      open my codes
+                    </button>
+                  </>
                 )}
-                <p className={styles.nftSubtitle}>
-                  {isMinted ? `by "${walletAddress}"` : 'give your NFT a name!'}
-                </p>
-
-                <div className={styles.nftInfo}>
-                  <div className={styles.nftCreator}>
-                    Mint Tx Hash
-                  </div>
-                  <div className={styles.nftUrl}>
-                    kv. http://example.com
-                  </div>
-                  <div className={styles.nftUrl}>
-                    log. http://example.com
-                  </div>
-                  <div className={styles.dateBox}>
-                    <div className={styles.dateLabel}>Date of Release</div>
-                    <div className={styles.dateValue}>{releaseDate}</div>
-                  </div>
-                </div>
-
-                <button className={styles.openCodesButton} onClick={handleFlip}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 19L8 12L15 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  open my codes
-                </button>
               </div>
 
-              {/* 카드 뒷면 */}
               <div className={styles.cardBack}>
                 <button className={styles.closeButton} onClick={handleFlip}>×</button>
                 <h3 className={styles.backTitle}>Verified Code</h3>
@@ -248,7 +274,7 @@ function elizaPlugin() {
           </div>
 
           {!isMinted && (
-            <div className={`${styles.mintingSection} ${isMinting ? styles.minting : ''}`}>
+            <div className={`${styles.mintingSection} ${isMinting || isMinted ? styles.minting : ''} ${isFadingOut ? styles.mintingFadingOut : ''}`}>
               <div className={`${styles.mintPrompt} ${isWalletConnected ? styles.hidden : ''}`}>
                 <div className={styles.mintArrow}>
                   <Image src="/images/arrow-curve.svg" alt="Arrow" width={48} height={48} />
