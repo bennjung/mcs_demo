@@ -4,9 +4,17 @@ import { useState } from 'react';
 import Image from 'next/image';
 import styles from '../styles/mypage.module.css';
 
+interface Module {
+  id: number;
+  name: string;
+  date: string;
+  tags: string[];
+}
+
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [activeMenu, setActiveMenu] = useState('profile');
+  const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   
   const cardBackgrounds = [
     '/images/market-card-background.png',
@@ -216,30 +224,73 @@ export default function MyPage() {
     <section className={styles.modulesSection}>
       <h2 className={styles.sectionTitle}>Verified Modules</h2>
       
-      <div className={styles.moduleGrid}>
-        {modules.map((module, index) => (
+      {selectedModule ? (
+        <div className={styles.moduleDetailView}>
           <div 
-            key={module.id} 
-            className={styles.moduleCard}
+            className={styles.moduleDetailCard}
             style={{ 
               backgroundImage: `url(${getRandomBackground()})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
+            onClick={() => setSelectedModule(null)}
           >
-            <h3 className={styles.moduleName}>{module.name}</h3>
-            <div className={styles.moduleDate}>
-              <div className={styles.verificationLabel}>verification date</div>
-              <div className={styles.verificationDate}>{module.date}</div>
+            <div className={styles.moduleBadge}>NFT</div>
+            <h3 className={styles.moduleDetailName}>{selectedModule.name}</h3>
+            <div className={styles.moduleDetailCreator}>
+              by "0x71C7656EC7ab88b"
             </div>
-            <div className={styles.moduleTags}>
-              {module.tags.map((tag, index) => (
-                <span key={index} className={styles.moduleTag}>{tag}</span>
+            <div className={styles.moduleVerification}>
+              <div className={styles.verificationDetailLabel}>verification date</div>
+              <div className={styles.verificationDetailDate}>{selectedModule.date}</div>
+            </div>
+            <div className={styles.moduleDetailTags}>
+              {selectedModule.tags.map((tag, index) => (
+                <span key={index} className={styles.moduleDetailTag}>{tag}</span>
               ))}
             </div>
+            <div className={styles.moduleDetailInfo}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Security Status</span>
+                <span className={styles.infoValue}>http://example.com</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Scan Detail</span>
+                <span className={styles.infoValue}>http://example.com</span>
+              </div>
+            </div>
+            <div className={styles.clickToCloseText}>
+              Click to return to module list
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className={styles.moduleGrid}>
+          {modules.map((module, index) => (
+            <div 
+              key={module.id} 
+              className={styles.moduleCard}
+              style={{ 
+                backgroundImage: `url(${getRandomBackground()})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+              onClick={() => setSelectedModule(module)}
+            >
+              <h3 className={styles.moduleName}>{module.name}</h3>
+              <div className={styles.moduleDate}>
+                <div className={styles.verificationLabel}>verification date</div>
+                <div className={styles.verificationDate}>{module.date}</div>
+              </div>
+              <div className={styles.moduleTags}>
+                {module.tags.map((tag, index) => (
+                  <span key={index} className={styles.moduleTag}>{tag}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 
@@ -261,7 +312,7 @@ export default function MyPage() {
     <div className={styles.pageContainer}>
       <header className={styles.pageHeader}>
         <div className={styles.pageTitle}>
-          <Image src="/images/ai-audit-icon.svg" alt="Logo" width={32} height={32} className={styles.pageLogo} style={{ color: '#3b82f6', filter: 'invert(43%) sepia(58%) saturate(2406%) hue-rotate(202deg) brightness(101%) contrast(96%)' }} />
+          <Image src="/images/mypage-icon.svg" alt="Logo" width={32} height={32} className={styles.pageLogo} style={{ color: '#3b82f6', filter: 'invert(43%) sepia(58%) saturate(2406%) hue-rotate(202deg) brightness(101%) contrast(96%)' }} />
           <div className={styles.titleWrapper}>
             <h1>My Page</h1>
             <div className={styles.titleUnderline}>

@@ -177,11 +177,11 @@ export default function CodeNFTPage() {
                     <div className={styles.resultReport}>
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>Security Status</span>
-                        <a href="https://example.com" className={styles.resultValue}>https:/// example.com</a>
+                        <a href="https://example.com" className={styles.resultValue}>https:// example.com</a>
                       </div>
                       <div className={styles.resultRow}>
-                        <span className={styles.resultLabel}>Scan Log.</span>
-                        <a href="https://example.com" className={styles.resultValue}>https:/// example.com</a>
+                        <span className={styles.resultLabel}>Scan Detail</span>
+                        <a href="https://example.com" className={styles.resultValue}>https:// example.com</a>
                       </div>
                     </div>
                     <div className={styles.dateBox}>
