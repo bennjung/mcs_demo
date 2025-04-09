@@ -1,7 +1,6 @@
 'use client';
 
 import "./globals.css";
-import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import MarketIcon from "@/public/images/market-icon.svg";
@@ -12,8 +11,6 @@ import { usePathname } from "next/navigation";
 import './styles/ai-audit.css';
 import './styles/code-nft.module.css';
 import './styles/loading-transition.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
@@ -29,7 +26,7 @@ export default function RootLayout({
   }, [pathname]);
 
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en">
       <body>
         <div className="layout-container">
           <aside className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>

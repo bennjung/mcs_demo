@@ -3,10 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Pretendard Variable 폰트 설정 */
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 234, 234, 234;
   --sidebar-width: 80px;
+  --font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
 }
 
 @theme inline {
@@ -31,6 +41,7 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family);
 }
 
 .layout-container {
@@ -317,7 +328,7 @@ body {
 
 .button-primary:hover {
   background-color: #27272A;
-  min-width: 232.5px;
+  min-width: 225px;
 }
 
 .button-primary:hover .icon {
