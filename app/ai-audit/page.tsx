@@ -395,7 +395,7 @@ export default function AiAuditPage() {
               <img src="/images/ai-audit-icon.svg" alt="AI Audit Icon" />
             </div>
             <div className="header-text">
-              <h1>AI-Modit</h1>
+              <h1>Modit</h1>
               <h2>
                 <span className="title-with-underline">Smart Contract</span>
                 <br />

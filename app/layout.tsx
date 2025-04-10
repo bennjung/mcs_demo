@@ -49,7 +49,7 @@ export default function RootLayout({
                 </Link>
                 <Link href="/ai-audit" className={`nav-item ${pathname === '/ai-audit' ? 'active' : ''}`}>
                   <AiAuditIcon className="icon" width={24} height={24} />
-                  <span className="text">ai-modit</span>
+                  <span className="text">Modit</span>
                 </Link>
                 <Link href="/mypage" className={`nav-item ${pathname === '/mypage' ? 'active' : ''}`}>
                   <MyPageIcon className="icon" width={24} height={24} />
