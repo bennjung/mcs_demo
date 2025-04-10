@@ -200,10 +200,10 @@
 }
 
 .module-card p {
-  color: #666;
+  color: #333;
   margin-bottom: 1.5rem;
   line-height: 1.5;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .module-stats {
@@ -217,7 +217,7 @@
 }
 
 .module-stats p {
-  color: #666;
+  color: #333;
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }

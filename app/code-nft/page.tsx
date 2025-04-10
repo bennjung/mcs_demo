@@ -5,10 +5,27 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import styles from '../styles/code-nft.module.css';
 
+// Restored MetaMask provider type definition
+interface EthereumProvider {
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: unknown[] | object }) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+}
+
+declare global {
+  interface Window {
+    ethereum?: EthereumProvider;
+  }
+}
+
 interface NFTData {
   code: string;
   auditResult: any;
 }
+
+// TODO: 실제 0g Newton Testnet에 배포된 NFT 컬렉션 컨트랙트 주소로 변경
+// const NFT_CONTRACT_ADDRESS = 'YOUR_NFT_CONTRACT_ADDRESS';
 
 export default function CodeNFTPage() {
   const searchParams = useSearchParams();
@@ -16,14 +33,18 @@ export default function CodeNFTPage() {
   const [nftData, setNftData] = useState<NFTData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [nftName, setNftName] = useState('Eliza Plugin');
+  // Restored original wallet state
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
+  // Removed Thirdweb hooks (useAddress, useConnectionStatus)
+
   const [isCardFlipped, setIsCardFlipped] = useState(false);
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('0xdf23edfef');
-  const [tempAddress, setTempAddress] = useState('');
+  const [isEditingAddress, setIsEditingAddress] = useState(false); // Restore if needed, or keep commented
+  const [tempAddress, setTempAddress] = useState(''); // Restore if needed, or keep commented
   const [releaseDate, setReleaseDate] = useState('2025.04.07');
-  const [isMinting, setIsMinting] = useState(false);
+  const [isMinting, setIsMinting] = useState(false); 
   const [isMinted, setIsMinted] = useState(false);
+  const [mintedTxHash, setMintedTxHash] = useState<string | null>(null); // Keep for potential future use
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState('');
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -31,7 +52,7 @@ export default function CodeNFTPage() {
   useEffect(() => {
     const fetchNFTData = async () => {
       if (!sessionId) return;
-      
+
       setIsLoading(true);
       try {
         const response = await fetch(`/api/code-nft?sessionId=${sessionId}`);
@@ -59,47 +80,69 @@ export default function CodeNFTPage() {
     setReleaseDate(`${year}.${month}.${day}`);
   }, []);
 
-  const handleConnectWallet = () => {
-    setIsWalletConnected(true);
+  // Restored MetaMask connection handler
+  const handleConnectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (accounts.length > 0) {
+          setConnectedAddress(accounts[0]);
+          setIsWalletConnected(true);
+          console.log('Wallet connected:', accounts[0]);
+        } else {
+          console.error('No accounts found.');
+        }
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+      }
+    } else {
+      alert('MetaMask is not installed. Please install it to continue.');
+    }
   };
 
+  // Restored simple mint handler (simulates minting completion)
   const handleMint = () => {
-    if (!isWalletConnected) return;
-    
+    if (!isWalletConnected) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+    // alert(`Minting ${nftName} for ${connectedAddress} (Not implemented yet)`); // Remove alert
+
+    // Simulate minting process and switch to minted view
     setIsFadingOut(true);
+    setIsMinting(true); // Show loading state briefly
     
     setTimeout(() => {
-      setIsMinting(true);
-      
-      setTimeout(() => {
-        setIsMinted(true);
-        setIsMinting(false);
-        setIsFadingOut(false);
-      }, 1200);
-    }, 400);
+      setMintedTxHash('0x62bd8e352d8d1294b786f71dca3b043dd5565fdd2ed878f5ac7874923f3d3895'); // Use the actual hash provided
+      setIsMinted(true); // This will trigger the Mint Result view
+      setIsMinting(false);
+      setIsFadingOut(false);
+    }, 1200); // Simulate minting time
   };
 
   const handleFlip = () => {
     setIsCardFlipped(!isCardFlipped);
   };
 
+  // Restore address editing handlers if they were used, otherwise keep commented
+  /*
   const handleAddressChange = () => {
     setIsEditingAddress(true);
-    setTempAddress(walletAddress);
+    setTempAddress(connectedAddress || '');
   };
-
   const handleAddressSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (tempAddress.trim()) {
-      setWalletAddress(tempAddress.trim());
+      // This logic doesn't make sense with direct MetaMask connection
+      // setConnectedAddress(tempAddress.trim()); 
       setIsEditingAddress(false);
     }
   };
-
   const handleAddressCancel = () => {
     setIsEditingAddress(false);
     setTempAddress('');
   };
+  */
 
   const handleNameChange = () => {
     if (!isMinted) {
@@ -166,27 +209,32 @@ export default function CodeNFTPage() {
                 {isMinted ? (
                   <div className={styles.nftInfo} style={{ '--display-line': 'none' } as React.CSSProperties}>
                     <div className={styles.nftTitle}>
-                      Eliza Plugin
+                      {nftName}
                     </div>
                     <div className={`${styles.nftSubtitle} ${styles.mintedSubtitle}`}>
-                      by "0xdf23edfef"
+                      {connectedAddress ? `by "${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}"` : 'by "Not Connected"'}
                     </div>
                     <div className={`${styles.nftCreator} ${styles.mintedCreator}`}>
                       Mint Tx Hash
                     </div>
+                    <div className={styles.txHash}>
+                       {mintedTxHash ? (
+                         <a href={`https://chainscan-newton.0g.ai/tx/${mintedTxHash}`} target="_blank" rel="noopener noreferrer">
+                            {`${mintedTxHash.substring(0, 10)}...${mintedTxHash.substring(mintedTxHash.length - 8)}`}
+                         </a>
+                        ) : (
+                          '-'
+                        )}
+                    </div>
                     <div className={styles.resultReport}>
                       <div className={styles.resultRow}>
-                        <span className={styles.resultLabel}>Security Status</span>
-                        <a href="https://example.com" className={styles.resultValue}>https:// example.com</a>
-                      </div>
-                      <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>Scan Detail</span>
-                        <a href="https://example.com" className={styles.resultValue}>https:// example.com</a>
+                        <a href={`https://storagescan-newton.0g.ai/submission/6479508?network=turbo`} target="_blank" rel="noopener noreferrer" className={styles.resultValue}><strong>0g Storage</strong></a>
                       </div>
                     </div>
                     <div className={styles.dateBox}>
                       <div className={styles.dateLabel}>Date of Release</div>
-                      <div className={styles.dateValue}>2025.04.12</div>
+                      <div className={styles.dateValue}>{releaseDate}</div>
                     </div>
                   </div>
                 ) : (
@@ -207,8 +255,8 @@ export default function CodeNFTPage() {
                         </div>
                       </form>
                     ) : (
-                      <h2 
-                        className={`${styles.nftTitle} ${!isMinted ? styles.editable : ''}`} 
+                      <h2
+                        className={`${styles.nftTitle} ${!isMinted ? styles.editable : ''}`}
                         onClick={handleNameChange}
                       >
                         {nftName}
@@ -219,7 +267,7 @@ export default function CodeNFTPage() {
                       give your NFT a name!
                     </p>
                     <div className={styles.nftInfo}>
-                      <div className={styles.nftCreator}>Creator: DEV1</div>
+                      <div className={styles.nftCreator}>Creator: {isWalletConnected ? `${connectedAddress?.substring(0, 6)}...${connectedAddress?.substring(connectedAddress.length - 4)}` : ' '}</div>
                       <div className={styles.dateBox}>
                         <div className={styles.dateLabel}>Date of Release</div>
                         <div className={styles.dateValue}>{releaseDate}</div>
@@ -240,33 +288,7 @@ export default function CodeNFTPage() {
                 <h3 className={styles.backTitle}>Verified Code</h3>
                 <div className={styles.codeContent}>
                   <pre>
-                    {nftData?.code || `// Example Verified Code
-function elizaPlugin() {
-  // AI 기반 대화형 인터페이스
-  class ElizaBot {
-    constructor() {
-      this.memory = new Map();
-      this.patterns = [
-        /* 검증된 패턴 매칭 로직 */
-      ];
-    }
-
-    async processInput(input) {
-      // 사용자 입력 처리
-      const response = await this.analyze(input);
-      return this.formatResponse(response);
-    }
-
-    analyze(input) {
-      // 고급 자연어 처리
-      return this.patterns.find(
-        pattern => pattern.match(input)
-      );
-    }
-  }
-
-  return new ElizaBot();
-}`}
+                    {nftData?.code || `// Example Verified Code\nfunction elizaPlugin() {\n  // AI 기반 대화형 인터페이스\n  class ElizaBot {\n    constructor() {\n      this.memory = new Map();\n      this.patterns = [\n        /* 검증된 패턴 매칭 로직 */\n      ];\n    }\n\n    async processInput(input) {\n      // 사용자 입력 처리\n      const response = await this.analyze(input);\n      return this.formatResponse(response);\n    }\n\n    analyze(input) {\n      // 고급 자연어 처리\n      return this.patterns.find(\n        pattern => pattern.match(input)\n      );\n    }\n  }\n\n  return new ElizaBot();\n}`}
                   </pre>
                 </div>
               </div>
@@ -274,7 +296,7 @@ function elizaPlugin() {
           </div>
 
           {!isMinted && (
-            <div className={`${styles.mintingSection} ${isMinting || isMinted ? styles.minting : ''} ${isFadingOut ? styles.mintingFadingOut : ''}`}>
+            <div className={`${styles.mintingSection} ${isMinting ? styles.minting : ''} ${isFadingOut ? styles.mintingFadingOut : ''}`}>
               <div className={`${styles.mintPrompt} ${isWalletConnected ? styles.hidden : ''}`}>
                 <div className={styles.mintArrow}>
                   <Image src="/images/arrow-curve.svg" alt="Arrow" width={48} height={48} />
@@ -283,40 +305,26 @@ function elizaPlugin() {
               </div>
 
               <div className={styles.mintBox}>
-                {isWalletConnected && (
+                {/* Restored Wallet Address Box for connected state */}
+                {isWalletConnected && connectedAddress && (
                   <div className={styles.walletAddressBox}>
                     <h3>Web3 Wallet Address</h3>
                     <Image src="/images/wallet.svg" alt="Wallet" width={20} height={20} />
-                    {isEditingAddress ? (
-                      <form onSubmit={handleAddressSubmit} className={styles.addressForm}>
-                        <input
-                          type="text"
-                          value={tempAddress}
-                          onChange={(e) => setTempAddress(e.target.value)}
-                          className={styles.addressInput}
-                          placeholder="Enter wallet address"
-                        />
-                        <div className={styles.addressActions}>
-                          <button type="submit" className={styles.addressSubmit}>Save</button>
-                          <button type="button" onClick={handleAddressCancel} className={styles.addressCancel}>Cancel</button>
-                        </div>
-                      </form>
-                    ) : (
-                      <>
-                        <p className={styles.walletAddress}>{walletAddress}</p>
-                        <div className={styles.changeWalletText} onClick={handleAddressChange}>
-                          Change wallet address
-                        </div>
-                      </>
-                    )}
+                    <p className={styles.walletAddress}>{`${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`}</p>
+                    {/* Restore Change address link if needed, but logic needs review */}
+                    {/* <div className={styles.changeWalletText} onClick={handleAddressChange}>Change wallet address</div> */}
                   </div>
                 )}
 
-                <p className={styles.walletMessage}>
-                  "Make sure to connect your<br />
-                  <strong>Web3 Wallet</strong> to continue!"
-                </p>
-                
+                {/* Wallet Message (show if not connected) */}
+                {!isWalletConnected && (
+                  <p className={styles.walletMessage}>
+                    "Make sure to connect your<br />
+                    <strong>Web3 Wallet</strong> to continue!"
+                  </p>
+                )}
+
+                {/* Restored Connect/Connected Button Logic */}
                 {isWalletConnected ? (
                   <button className={`${styles.connectWalletButton} ${styles.connected}`}>
                     <Image src="/images/checkbox.svg" alt="Connected" width={20} height={20} />
@@ -329,19 +337,28 @@ function elizaPlugin() {
                   </button>
                 )}
 
+                {/* Restored Mint Button */}
                 <button
                   className={`${styles.mintButton} ${isWalletConnected ? styles.mintButtonEnabled : styles.mintButtonDisabled}`}
                   onClick={handleMint}
-                  disabled={!isWalletConnected}
+                  disabled={!isWalletConnected || isMinting}
                 >
-                  <Image 
-                    src="/images/rocket.svg" 
-                    alt="Rocket" 
-                    width={20} 
-                    height={20} 
-                    className={styles.rocketIcon}
-                  />
-                  <span>Mint</span>
+                  {isMinting ? (
+                    <>
+                      <span>Minting...</span>
+                    </>
+                   ) : (
+                    <>
+                      <Image
+                        src="/images/rocket.svg"
+                        alt="Rocket"
+                        width={20}
+                        height={20}
+                        className={styles.rocketIcon}
+                      />
+                      <span>Mint</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

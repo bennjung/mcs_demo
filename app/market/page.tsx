@@ -1,6 +1,15 @@
+'use client';
+
 import '../styles/market.css';
+import { useRouter } from 'next/navigation';
 
 export default function MarketPage() {
+  const router = useRouter();
+
+  const handleCategoryClick = (category: string) => {
+    router.push(`/market/${encodeURIComponent(category)}`);
+  };
+
   return (
     <div className="market-container">
       <div className="market-header">
@@ -13,9 +22,9 @@ export default function MarketPage() {
       </div>
       
       <div className="module-grid">
-        <div className="module-card ai">
+        <div className="module-card ai" onClick={() => handleCategoryClick('AI')}>
           <h2>AI</h2>
-          <p>AI modules for secure, fast, and borderless transactions</p>
+          <p>AI modules for on-chain analysis, trading strategies.</p>
           <div className="module-stats">
             <p>Registered module count</p>
             <strong>3,366</strong>
@@ -30,9 +39,9 @@ export default function MarketPage() {
           </div>
         </div>
 
-        <div className="module-card defi">
+        <div className="module-card defi" onClick={() => handleCategoryClick('Defi')}>
           <h2>Defi</h2>
-          <p>Defi modules for secure, fast, and borderless transactions</p>
+          <p>DeFi modules for yield optimization, lending, liquidity.</p>
           <div className="module-stats">
             <p>Registered module count</p>
             <strong>14,002</strong>
@@ -48,9 +57,9 @@ export default function MarketPage() {
           </div>
         </div>
 
-        <div className="module-card wallet">
+        <div className="module-card wallet" onClick={() => handleCategoryClick('Wallet')}>
           <h2>Wallet</h2>
-          <p>Wallet modules for secure, fast, and borderless transactions</p>
+          <p>Secure wallets for multi-chain asset management, DApp integration.</p>
           <div className="module-stats">
             <p>Registered module count</p>
             <strong>2,105</strong>
@@ -64,9 +73,9 @@ export default function MarketPage() {
           </div>
         </div>
 
-        <div className="module-card privacy">
+        <div className="module-card privacy" onClick={() => handleCategoryClick('Privacy')}>
           <h2>Privacy</h2>
-          <p>Privacy modules for secure, fast, and borderless transactions</p>
+          <p>ZKP modules for anonymous transactions, data privacy.</p>
           <div className="module-stats">
             <p>Registered module count</p>
             <strong>1,890</strong>

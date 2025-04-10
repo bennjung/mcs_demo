@@ -1,20 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import styles from '../styles/mypage.module.css';
+import LoadingTransition from '../components/LoadingTransition';
 
 interface Module {
   id: number;
   name: string;
   date: string;
   tags: string[];
+  scanUrl: string;
 }
 
 export default function MyPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
   const [activeMenu, setActiveMenu] = useState('profile');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
+  const [isNavigatingToListing, setIsNavigatingToListing] = useState(false);
+  const listButtonRef = useRef<HTMLButtonElement>(null);
   
   const cardBackgrounds = [
     '/images/market-card-background.png',
@@ -25,66 +31,62 @@ export default function MyPage() {
     return cardBackgrounds[Math.floor(Math.random() * cardBackgrounds.length)];
   };
   
-  const modules = [
+  const modules: Module[] = [
     {
       id: 1,
       name: 'Eliza Plugin',
       date: '2025.03.12',
-      tags: ['AI', 'Chat']
+      tags: ['AI', 'Chat'],
+      scanUrl: 'http://example.com/scan/1'
     },
     {
       id: 2,
       name: 'Chain Sync',
       date: '2025.03.14',
-      tags: ['Sync', 'Data']
+      tags: ['Sync', 'Data'],
+      scanUrl: 'http://example.com/scan/2'
     },
     {
       id: 3,
       name: 'Wallet Shield',
       date: '2025.03.18',
-      tags: ['Sec', 'Tx']
+      tags: ['Sec', 'Tx'],
+      scanUrl: 'http://example.com/scan/3'
     },
     {
       id: 4,
       name: 'Token Forge',
       date: '2025.03.14', 
-      tags: ['Token']
+      tags: ['Token'],
+      scanUrl: 'http://example.com/scan/4'
     },
     {
       id: 5,
       name: 'Vote Chain',
       date: '2025.03.11',
-      tags: ['AI']
+      tags: ['AI'],
+      scanUrl: 'http://example.com/scan/5'
     },
     {
       id: 6,
       name: 'Stake Master',
       date: '2025.03.18',
-      tags: ['Stake']
+      tags: ['Stake'],
+      scanUrl: 'http://example.com/scan/6'
     },
     {
       id: 7,
       name: 'Zk Prover',
       date: '2025.03.18',
-      tags: ['ZKP']
+      tags: ['ZKP'],
+      scanUrl: 'http://example.com/scan/7'
     },
     {
       id: 8,
       name: 'Trade bit',
       date: '2025.03.18',
-      tags: ['Trade']
-    },
-    {
-      id: 9,
-      name: 'Vote Chain',
-      date: '2025.03.11',
-      tags: ['AI']
-    },
-    {
-      id: 10,
-      name: 'Stake Master',
-      date: '2025.03.18',
-      tags: ['Stake']
+      tags: ['Trade'],
+      scanUrl: 'http://example.com/scan/8'
     }
   ];
 
@@ -220,6 +222,13 @@ export default function MyPage() {
     </div>
   );
 
+  const handleListButtonClick = (module: Module) => {
+    setIsNavigatingToListing(true);
+    setTimeout(() => {
+      router.push(`/listing?moduleId=${module.id}`);
+    }, 300);
+  };
+
   const ModulesContent = () => (
     <section className={styles.modulesSection}>
       <h2 className={styles.sectionTitle}>Verified Modules</h2>
@@ -233,13 +242,29 @@ export default function MyPage() {
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
-            onClick={() => setSelectedModule(null)}
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+              if (!listButtonRef.current?.contains(e.target as Node)) {
+                setSelectedModule(null);
+              }
+            }}
           >
             <div className={styles.moduleBadge}>NFT</div>
             <h3 className={styles.moduleDetailName}>{selectedModule.name}</h3>
             <div className={styles.moduleDetailCreator}>
               by "0x71C7656EC7ab88b"
             </div>
+            <button 
+              ref={listButtonRef}
+              className={`${styles.listButton} ${styles.actionButton}`}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                if (selectedModule) {
+                  handleListButtonClick(selectedModule);
+                }
+              }}
+            >
+              List Module
+            </button>
             <div className={styles.moduleVerification}>
               <div className={styles.verificationDetailLabel}>verification date</div>
               <div className={styles.verificationDetailDate}>{selectedModule.date}</div>
@@ -251,26 +276,34 @@ export default function MyPage() {
             </div>
             <div className={styles.moduleDetailInfo}>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Security Status</span>
-                <span className={styles.infoValue}>http://example.com</span>
+                <span>Module ID:</span>
+                <span>{selectedModule.id}</span>
               </div>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Scan Detail</span>
-                <span className={styles.infoValue}>http://example.com</span>
+                <span>Scan Detail:</span>
+                <a 
+                  href={selectedModule.scanUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.scanLink}
+                >
+                  View Scan Detail
+                </a>
               </div>
-            </div>
-            <div className={styles.clickToCloseText}>
-              Click to return to module list
+              <div className={styles.infoRow}>
+                <span>Date:</span>
+                <span>{selectedModule.date}</span>
+              </div>
             </div>
           </div>
         </div>
       ) : (
         <div className={styles.moduleGrid}>
-          {modules.map((module, index) => (
-            <div 
-              key={module.id} 
+          {modules.map((module) => (
+            <div
+              key={module.id}
               className={styles.moduleCard}
-              style={{ 
+              style={{
                 backgroundImage: `url(${getRandomBackground()})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
@@ -309,111 +342,113 @@ export default function MyPage() {
   };
 
   return (
-    <div className={styles.pageContainer}>
-      <header className={styles.pageHeader}>
-        <div className={styles.pageTitle}>
-          <Image src="/images/mypage-icon.svg" alt="Logo" width={32} height={32} className={styles.pageLogo} style={{ color: '#3b82f6', filter: 'invert(43%) sepia(58%) saturate(2406%) hue-rotate(202deg) brightness(101%) contrast(96%)' }} />
-          <div className={styles.titleWrapper}>
-            <h1>My Page</h1>
-            <div className={styles.titleUnderline}>
-              <Image src="/images/mypage-underline.svg" alt="Underline" width={229} height={27} />
+    <>
+      {isNavigatingToListing && <LoadingTransition />}
+      <div className={styles.pageContainer}>
+        <header className={styles.pageHeader}>
+          <div className={styles.pageTitle}>
+            <Image src="/images/mypage-icon.svg" alt="Logo" width={32} height={32} className={styles.pageLogo} style={{ color: '#3b82f6', filter: 'invert(43%) sepia(58%) saturate(2406%) hue-rotate(202deg) brightness(101%) contrast(96%)' }} />
+            <div className={styles.titleWrapper}>
+              <h1>My Page</h1>
+              <div className={styles.titleUnderline}>
+                <Image src="/images/mypage-underline.svg" alt="Underline" width={229} height={27} />
+              </div>
             </div>
           </div>
-        </div>
-      </header>
-      
-      <div className={styles.pageContent}>
-        <div className={styles.sidebar}>
-          <nav className={styles.sideNav}>
-            <button 
-              className={`${styles.navItem} ${activeMenu === 'profile' ? styles.active : ''}`}
-              onClick={() => {
-                setActiveMenu('profile');
-                setActiveTab('profile');
-              }}
-            >
-              <span className={styles.navIcon}>👤</span>
-              My Profile
-            </button>
-            <button 
-              className={`${styles.navItem} ${activeMenu === 'social' ? styles.active : ''}`}
-              onClick={() => {
-                setActiveMenu('social');
-                setActiveTab('social');
-              }}
-            >
-              <span className={styles.navIcon}>🔗</span>
-              Social Connect
-            </button>
-            <button 
-              className={`${styles.navItem} ${activeMenu === 'wallet' ? styles.active : ''}`}
-              onClick={() => {
-                setActiveMenu('wallet');
-                setActiveTab('wallet');
-              }}
-            >
-              <span className={styles.navIcon}>💼</span>
-              Wallet
-            </button>
-            <button 
-              className={`${styles.navItem} ${activeMenu === 'modules' ? styles.active : ''}`}
-              onClick={() => {
-                setActiveMenu('modules');
-                setActiveTab('modules');
-              }}
-            >
-              <span className={styles.navIcon}>📦</span>
-              My Modules
-            </button>
-          </nav>
-        </div>
+        </header>
         
-        <div className={styles.mainContent}>
-          <div className={styles.contentHeader}>
-            <div className={styles.tabs}>
+        <div className={styles.pageContent}>
+          <div className={styles.sidebar}>
+            <nav className={styles.sideNav}>
               <button 
-                className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+                className={`${styles.navItem} ${activeMenu === 'profile' ? styles.active : ''}`}
                 onClick={() => {
-                  setActiveTab('profile');
                   setActiveMenu('profile');
+                  setActiveTab('profile');
                 }}
               >
+                <span className={styles.navIcon}>👤</span>
                 My Profile
               </button>
               <button 
-                className={`${styles.tab} ${activeTab === 'social' ? styles.activeTab : ''}`}
+                className={`${styles.navItem} ${activeMenu === 'social' ? styles.active : ''}`}
                 onClick={() => {
-                  setActiveTab('social');
                   setActiveMenu('social');
+                  setActiveTab('social');
                 }}
               >
+                <span className={styles.navIcon}>🔗</span>
                 Social Connect
               </button>
               <button 
-                className={`${styles.tab} ${activeTab === 'wallet' ? styles.activeTab : ''}`}
+                className={`${styles.navItem} ${activeMenu === 'wallet' ? styles.active : ''}`}
                 onClick={() => {
-                  setActiveTab('wallet');
                   setActiveMenu('wallet');
+                  setActiveTab('wallet');
                 }}
               >
+                <span className={styles.navIcon}>💼</span>
                 Wallet
               </button>
               <button 
-                className={`${styles.tab} ${activeTab === 'modules' ? styles.activeTab : ''}`}
+                className={`${styles.navItem} ${activeMenu === 'modules' ? styles.active : ''}`}
                 onClick={() => {
-                  setActiveTab('modules');
                   setActiveMenu('modules');
+                  setActiveTab('modules');
                 }}
               >
+                <span className={styles.navIcon}>📦</span>
                 My Modules
               </button>
-            </div>
-            <button className={styles.moreButton}>+ more</button>
+            </nav>
           </div>
           
-          {renderContent()}
+          <div className={styles.mainContent}>
+            <div className={styles.contentHeader}>
+              <div className={styles.tabs}>
+                <button 
+                  className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+                  onClick={() => {
+                    setActiveTab('profile');
+                    setActiveMenu('profile');
+                  }}
+                >
+                  My Profile
+                </button>
+                <button 
+                  className={`${styles.tab} ${activeTab === 'social' ? styles.activeTab : ''}`}
+                   onClick={() => {
+                     setActiveTab('social');
+                     setActiveMenu('social');
+                   }}
+                 >
+                   Social Connect
+                 </button>
+                 <button 
+                   className={`${styles.tab} ${activeTab === 'wallet' ? styles.activeTab : ''}`}
+                   onClick={() => {
+                     setActiveTab('wallet');
+                     setActiveMenu('wallet');
+                   }}
+                 >
+                   Wallet
+                 </button>
+                 <button 
+                   className={`${styles.tab} ${activeTab === 'modules' ? styles.activeTab : ''}`}
+                   onClick={() => {
+                     setActiveTab('modules');
+                     setActiveMenu('modules');
+                   }}
+                 >
+                   My Modules
+                 </button>
+              </div>
+            </div>
+            
+            {renderContent()}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -4,18 +4,21 @@ import { useState } from 'react';
 import Image from "next/image";
 import LoginModal from './components/LoginModal';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface FeatureDetail {
   title: string;
   shortDescription: string;
   fullDescription: string;
+  icon: React.ReactNode;
+  categorySlug: string;
 }
 
 export default function Home() {
+  const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 
-  const features = [
+  const features: FeatureDetail[] = [
     {
       title: "AI-Powered Matching",
       shortDescription: "Find the perfect code with our AI matching system.",
@@ -28,51 +31,70 @@ export default function Home() {
           height={80}
           className="icon"
         />
-      )
+      ),
+      categorySlug: "AI"
     },
     {
-      title: "Crypto Payments",
-      shortDescription: "Securely process transactions using blockchain technology.",
-      fullDescription: "Enable fast, borderless payments with multiple cryptocurrency options. Implement smart contracts for automated and trustless transactions.",
+      title: "DeFi Integrations",
+      shortDescription: "Integrate decentralized finance features easily.",
+      fullDescription: "Access DeFi protocols, manage assets, and build financial applications on the blockchain.",
       icon: (
         <Image
           src="/images/crypto-icon.svg"
-          alt="Crypto Icon"
+          alt="DeFi Icon"
           width={80}
           height={80}
           className="icon"
         />
-      )
+      ),
+      categorySlug: "DeFi"
     },
     {
-      title: "Trustless Trading",
-      shortDescription: "Trade with confidence in our secure, decentralized marketplace.",
-      fullDescription: "Smart contracts ensure fair transactions while our escrow system protects both buyers and sellers. Experience truly trustless trading.",
+      title: "Gaming Modules",
+      shortDescription: "Build immersive Web3 games faster.",
+      fullDescription: "Leverage pre-built modules for player management, item ownership (NFTs), and in-game economies.",
       icon: (
         <Image
           src="/images/trading-icon.svg"
-          alt="Trading Icon"
+          alt="Gaming Icon"
           width={80}
           height={80}
           className="icon"
         />
-      )
+      ),
+      categorySlug: "Gaming"
     },
     {
-      title: "Global Marketplace",
-      shortDescription: "Connect with developers worldwide in our thriving marketplace.",
-      fullDescription: "Access a diverse range of code solutions, collaborate on projects, and expand your reach in the global developer community.",
+      title: "Infra & Tools",
+      shortDescription: "Essential infrastructure and developer tools.",
+      fullDescription: "Find tools for deployment, monitoring, security audits, and more to streamline your development workflow.",
       icon: (
         <Image
           src="/images/globe-icon.svg"
-          alt="Globe Icon"
+          alt="Infra Icon"
           width={80}
           height={80}
           className="icon"
         />
-      )
+      ),
+      categorySlug: "Infra"
     }
   ];
+
+  const handleFeatureCardClick = (categorySlug: string) => {
+    console.log(`handleFeatureCardClick called with slug: ${categorySlug}`);
+    if (categorySlug === 'AI') {
+      console.log('Attempting to navigate to /market/AI');
+      try {
+        router.push(`/market/${categorySlug}`);
+        console.log('router.push executed successfully');
+      } catch (error) {
+        console.error('Error during router.push:', error);
+      }
+    } else {
+      console.log(`Navigation skipped for category: ${categorySlug}`);
+    }
+  };
 
   return (
     <main>
@@ -98,7 +120,7 @@ export default function Home() {
               <path d="M19 12H4.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <Link href="/market" className="button button-secondary">
+          <Link href="/market/All" className="button button-secondary">
             <span>Explore the Marketplace</span>
           </Link>
         </div>
@@ -108,27 +130,20 @@ export default function Home() {
         {features.map((feature, index) => (
           <div
             key={index}
-            className={`feature-card ${selectedCardIndex === index ? 'expanded' : ''}`}
-            onClick={() => setSelectedCardIndex(selectedCardIndex === index ? null : index)}
+            className="feature-card"
+            onClick={() => {
+              console.log(`Card clicked: ${feature.title}`);
+              handleFeatureCardClick(feature.categorySlug);
+            }}
+            style={{ cursor: feature.categorySlug === 'AI' ? 'pointer' : 'default' }}
           >
             <h3 className="feature-title">{feature.title}</h3>
             <div className="feature-icon">
               {feature.icon}
             </div>
             <p className="feature-description">
-              {selectedCardIndex === index ? feature.fullDescription : feature.shortDescription}
+              {feature.shortDescription}
             </p>
-            {selectedCardIndex === index && (
-              <button 
-                className="feature-detail-close"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedCardIndex(null);
-                }}
-              >
-                X
-              </button>
-            )}
           </div>
         ))}
       </div>

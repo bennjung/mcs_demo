@@ -1,0 +1,134 @@
+/* mcs_1st_NextProject/app/styles/market.module.css */
+
+.marketPageContainer {
+    padding: 2rem; /* Add overall padding */
+    max-width: 1200px; /* Limit maximum width */
+    margin: 0 auto; /* Center the container */
+  }
+  
+  /* Styles for the category title */
+  /* .categoryTitle { ... } - Removed or commented out */
+  
+  /* Optional: Override specific headerStyles if needed */
+  .categoryTitleOverride {
+    font-size: 2.25rem; /* Match code-nft header title size */
+    /* Add any other specific overrides for the category title here */
+  }
+  
+  /* Re-add headerLogo and headerUnderline styles if not globally available */
+  /* (Alternatively, ensure code-nft.module.css styles are applied correctly) */
+  
+  /* Example if needed: */
+  /*
+  .headerLogo {
+    position: absolute;
+    left: -2.5rem;
+    top: 50%; 
+    transform: translateY(-50%);
+    width: 32px; 
+    height: 32px;
+  }
+  
+  .headerUnderline {
+    position: absolute;
+    bottom: -0.8rem; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150%; 
+    height: 1.2rem;
+    background-image: url('/images/title-underline.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  */
+  
+  /* Styles for the info box inside the module card */
+  .moduleInfoBox {
+    background-color: rgba(243, 244, 246, 0.8);
+    border-radius: 0.5rem; /* Smaller radius for inner box */
+    padding: 1rem 1rem; /* Reduced vertical padding */
+    margin-top: 0.75rem; /* Space below purchase button */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    /* Remove width/margin overrides if not needed */
+    border-top: none; /* Remove top border */
+  }
+  
+  .infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem; /* Slightly smaller font */
+    color: #374151; 
+    padding: 0.3rem 0; /* Increased vertical padding for spacing */
+  }
+  
+  .infoRow span:first-child {
+    font-weight: 500; 
+    color: #4B5563;
+  }
+  
+  .infoRow span:last-child {
+    font-weight: 600; 
+    color: #111827; 
+  }
+  
+  /* New styles for Purchase button */
+  .purchaseButton {
+    /* Apply Connect Wallet button styles */
+    background-color: #3b82f6; /* Blue background */
+    color: white;
+    border: none;
+    border-radius: 0.5rem; /* Match connect button radius */
+    padding: 0.5rem 1rem; /* Match connect button padding */
+    font-size: 0.95rem; /* Increased font size */
+    font-weight: 500; /* Match connect button font weight */
+    cursor: pointer;
+    transition: all 0.2s; /* Match connect button transition */
+    margin-top: 1rem; /* Adjusted margin-top */
+    /* Removed align-self: center; */
+    /* Removed width: 80%; */
+    width: 100%; /* Make button full width of its container */
+    display: block; /* Ensure it takes full width */
+  }
+  
+  .purchaseButton:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+  }
+  
+  /* Remove styles for inline details */
+  /*
+  .moduleDetailsInline {
+    margin-top: 1rem; 
+    padding: 0 0.5rem; 
+    text-align: center; 
+  }
+  
+  .modulePrice,
+  .modulePurchaseCount {
+    font-size: 0.9rem;
+    color: #4B5563; 
+    margin-bottom: 0.4rem; 
+  }
+  
+  .modulePrice span,
+  .modulePurchaseCount span {
+    font-weight: 600;
+    color: #1F2937; 
+    margin-left: 0.5em; 
+  }
+  */
+  
+  /* Ensure moduleGrid styles from mypage.module.css are sufficient */
+  /* You might need to adjust grid columns or gaps */
+  
+  /* Example adjustment if needed: */
+  /*
+  .moduleGrid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); Adjust minmax width
+    gap: 1.75rem; Adjust gap
+  }
+  */
